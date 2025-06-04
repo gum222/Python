@@ -4,22 +4,17 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Load dataset
 df = pd.read_csv("weather.csv", parse_dates=["Formatted Date"])
 
-# Convert and set datetime index
 df["Formatted Date"] = pd.to_datetime(df["Formatted Date"], utc=True)
 df = df.set_index("Formatted Date")
 
-# Drop rows with any missing values
 df.dropna(inplace=True)
 
-# Standardize weather summary
 df["Summary"] = df["Summary"].str.lower()
 
-# Define custom weather types
 def weather_type(summary):
-    summary = summary.lower()  # Make sure it’s case-insensitive
+    summary = summary.lower()  
 
     if "rain" in summary:
         return "rainy"
@@ -36,7 +31,6 @@ def weather_type(summary):
     else:
         return "other"
 
-# Apply weather type classification
 df["Weather Type"] = df["Summary"].apply(weather_type)
 
 #------------------------------
@@ -47,7 +41,6 @@ stats = df[columns].agg(['mean', 'median', 'max', 'min'])
 print("\nBasic Statistics:")
 print(stats)
 
-# Count weather types
 weather_counts = df["Weather Type"].value_counts()
 print("\nNumber of Days by Weather Type:")
 print(weather_counts)
@@ -55,7 +48,6 @@ print(weather_counts)
 #------------------------------
 # Step 3: Univariate Analysis
 #------------------------------
-# Histogram of average temperatures
 plt.figure(figsize=(10, 5))
 plt.hist(df["Temperature (C)"], bins=30, color='skyblue', edgecolor='black')
 plt.title("Distribution of Average Temperatures")
@@ -64,7 +56,6 @@ plt.ylabel("Frequency")
 plt.grid(True)
 plt.show()
 
-# Bar chart of weather conditions
 plt.figure(figsize=(7, 5))
 plt.bar(weather_counts.index, weather_counts.values, color='lightcoral', edgecolor='black')
 plt.title("Frequency of Weather Conditions")
@@ -76,7 +67,6 @@ plt.show()
 #------------------------------
 # Step 4: Time Series Trends
 #------------------------------
-# Daily temperature trend
 plt.figure(figsize=(12, 5))
 df["Temperature (C)"].resample("D").mean().plot(color='orange')
 plt.title("Daily Average Temperature Over Time")
@@ -86,7 +76,6 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-# Combined Humidity and Precipitation Trends
 daily_humidity = df["Humidity"].resample("D").mean()
 daily_precip = df["Precip Type"].resample("D").count()
 
@@ -109,7 +98,6 @@ plt.show()
 #------------------------------
 # Step 5: Bivariate Analysis
 #------------------------------
-# Scatter plot: Temperature vs Humidity
 plt.figure(figsize=(8, 5))
 plt.scatter(df["Temperature (C)"], df["Humidity"], alpha=0.5, color='purple')
 plt.title("Temperature vs. Humidity")
@@ -119,7 +107,6 @@ plt.grid(True)
 plt.tight_layout()
 plt.show()
 
-# Correlation matrix and heatmap
 correlation = df[["Temperature (C)", "Humidity", "Wind Speed (km/h)"]].corr()
 print("\nCorrelation Matrix:")
 print(correlation)
@@ -133,11 +120,10 @@ plt.title("Correlation Heatmap")
 plt.tight_layout()
 plt.show()
 
-# Box plot: Temperature by Weather Type
 plt.figure(figsize=(8, 5))
 df.boxplot(column="Temperature (C)", by="Weather Type", grid=False)
 plt.title("Temperature by Weather Type")
-plt.suptitle("")  # Removes the default title
+plt.suptitle("")  
 plt.xlabel("Weather Type")
 plt.ylabel("Temperature (°C)")
 plt.tight_layout()
@@ -146,22 +132,18 @@ plt.show()
 #------------------------------
 # Step 6: Key Questions to Explore
 #------------------------------
-# Find hottest and coldest days
 hottest_day = df["Temperature (C)"].idxmax()
 coldest_day = df["Temperature (C)"].idxmin()
 
-# Correlation between temp and humidity
 correlation_temp_humidity = df["Temperature (C)"].corr(df["Humidity"])
 
-# Compare temps on rainy vs non-rainy days
 rainy = df[df["Weather Type"] == "rainy"]["Temperature (C)"]
 non_rainy = df[df["Weather Type"] != "rainy"]["Temperature (C)"]
 
-# Wind speed by weather type
 wind_by_weather = df.groupby("Weather Type")["Wind Speed (km/h)"].mean()
 
 #------------------------------
-# Step 8: Reporting (for console, since no Jupyter)
+# Step 8: Reporting 
 #------------------------------
 print("\n--- Summary Report ---")
 print(f"Hottest Day: {hottest_day.date()} → {df.loc[hottest_day, 'Temperature (C)']:.2f}°C")
